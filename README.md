@@ -3,6 +3,8 @@ Min-Max Tic Tac Toe
 
 run ticTacToe.py using `pypy3 ticTacToe.py` or `py3 ticTacToe.py`
 
+for playing with UI, run gameUI.py using `pypy3 gameUI.py` or `py3 gameUI.py`
+
 change width of board and first player in `ticTacToe.py`
 
         0  . . .
