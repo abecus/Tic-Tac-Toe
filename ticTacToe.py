@@ -12,6 +12,8 @@ class TicTakToe:
         self.board = list((["."]*side for _ in range(side)))
         self.player = player
         self.side = side
+        self.x = None
+        self.y = None
     
     def printBoard(self):
         # prints board
@@ -29,7 +31,7 @@ class TicTakToe:
             self.side<py or py<0 or \
             self.board[px][py]!='.')
     
-    def isEnd(self):
+    def _isEnd(self):
         # checks if game has been ended
         
         # for rows
@@ -75,79 +77,62 @@ class TicTakToe:
         # returns for tie
         return '.'
     
-    def minLevel(self, alpha, beta):
-        # Player
-        nodeVal = float('inf')
-        py = None
-        px = None
-        result = self.isEnd()
-        
+    def isEnd(self):
+        result = self._isEnd()
         if result == 'x': return -1, 0, 0       # x won 
         if result == 'o': return 1, 0, 0       # o won
         if result == '.': return 0, 0, 0        # tie
+        return None
 
-        # doing backtracking here for min max tree
-        for i in range(self.side):
-            for j in range(self.side):
-                if self.board[i][j]=='.':
-                    self.board[i][j] = 'x'    # set x to that position (chosen)
-                    minVal, tx, ty = self.maxLevel(alpha, beta)
-                    
-                    if minVal<nodeVal:
-                        px, py, nodeVal = i, j, minVal
-                    self.board[i][j] = '.' # unchosen
-
-                    if nodeVal<=alpha:
-                        return nodeVal, px ,py
-                    beta = min(beta, nodeVal)
-                        
-        return nodeVal, px ,py
-    
-    def maxLevel(self, alpha, beta):
-        # AI
-        nodeVal = -float('inf')
-        py = None
-        px = None
-        result = self.isEnd()
+    def miniMax(self, alpha=-float('inf'), beta=float('inf'), palyer='o', depth=float('inf')):
+        end = self.isEnd()
+        if end:     return end
         
-        if result == 'x':   return -1, 0, 0     # x won 
-        if result == 'o':   return 1, 0, 0      # o won
-        if result == '.':   return 0, 0, 0      # tie
+        if palyer=='x':
+            nodeVal = float('inf')
+            for i in range(self.side):
+                for j in range(self.side):
+                    if self.board[i][j]=='.':
+                        self.board[i][j] = 'x'    # set x to that position (chosen)
+                        val, _, _ = self.miniMax(alpha=alpha, beta=beta, palyer='o', depth=depth-1)
+                        if val<nodeVal:    px, py, nodeVal = i, j, val
+                        self.board[i][j] = '.'     # unchosen that position
+                        if nodeVal<=alpha:    return nodeVal, px ,py      # pruning
+                        beta = min(beta, nodeVal)
+            return nodeVal, px ,py
+            
+        else:
+            nodeVal = -float('inf')
+            for i in range(self.side):
+                for j in range(self.side):
+                    if self.board[i][j]=='.':
+                        self.board[i][j] = 'o'    # set x to that position (chosen)
+                        val, _, _ = self.miniMax(alpha=alpha, beta=beta, palyer='x', depth=depth-1)
+                        if val>nodeVal:
+                            self.x, self.y = i, j
+                            px, py, nodeVal = i, j, val
+                        self.board[i][j] = '.'      # unchosen that position
+                        if nodeVal>=beta:      return nodeVal, px ,py   # pruning
+                        alpha = max(alpha, nodeVal)
+            return nodeVal, px ,py
 
-        # doing backtracking here for min max tree
-        for i in range(self.side):
-            for j in range(self.side):
-                if self.board[i][j]=='.':
-                    self.board[i][j] = 'o'    # set o to that position (chosen)
-                    maxVal, tx, ty = self.minLevel(alpha, beta)
-                    
-                    if maxVal>nodeVal:
-                        px, py, nodeVal = i, j, maxVal
-                        
-                    self.board[i][j] = '.' # unchosen
-
-                    if nodeVal>=beta:
-                        return nodeVal, px, py
-                    alpha = max(nodeVal, alpha)
-        return nodeVal, px ,py
-                        
-    def play(self, RecommendMoves=False):
+    def play(self, RecommendMoves=False, depth=None):
         import time
-        alpha = -float('inf')
-        beta = float('inf')
+        if depth:   depth+=1
+
+
         while True:
             self.printBoard()
-            res = self.isEnd()
+            res = self._isEnd()
             if res:
                 if res=='o':  print('o won')
                 elif res=='x':  print('x won')
                 elif res=='.':  print('tie')
                 return 'done'
             
-            
             while True and self.player=='x':
                 if RecommendMoves:
-                    nodeVal, qx, qy = self.minLevel(alpha, beta)
+                    nodeVal, qx, qy = self.miniMax(palyer='x', depth=depth)
                     print('Recommended move: X = {}, Y = {}'.format(qx, qy))
 
                 try:
@@ -167,12 +152,16 @@ class TicTakToe:
             else:
                 # If it's AI's turn
                 start = time.time()
-                nodeVal, px, py = self.maxLevel(alpha, beta)
+                nodeVal, px, py = self.miniMax(palyer='o', depth=depth)
+                print(self.x, self.y)
+                print('---', px, py)
                 end = time.time()
                 print('Evaluation time: {}s'.format(round(end - start, 7)))
                 self.board[px][py] = 'o'
                 self.player = 'x'
 
 if __name__ == "__main__":
+    
     game = TicTakToe(3, player='o')
-    game.play(RecommendMoves=0)
+    game.play(RecommendMoves=0, depth=100)
+    
