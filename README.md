@@ -1,4 +1,4 @@
-# Tic-Tac-Toe
+# Tic-Tac-Toe   [![Run on Repl.it](https://repl.it/badge/github/abecus/Tic-Tac-Toe)](https://repl.it/github/abecus/Tic-Tac-Toe)
 Min-Max Tic Tac Toe
 
 run ticTacToe.py using `pypy3 ticTacToe.py` or `py3 ticTacToe.py`
