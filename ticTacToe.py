@@ -1,4 +1,4 @@
-class TicTakToe:
+class TicTacToe:
     def __init__(self, side=3, player='x', *args, **kwargs):
         """
         Board's one side length (since its a square board 
@@ -164,4 +164,4 @@ if __name__ == "__main__":
     
     game = TicTakToe(3, player='o')
     game.play(RecommendMoves=0, depth=100)
-    
+  
