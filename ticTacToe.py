@@ -162,6 +162,6 @@ class TicTacToe:
 
 if __name__ == "__main__":
     
-    game = TicTakToe(3, player='o')
+    game = TicTacToe(3, player='o')
     game.play(RecommendMoves=0, depth=100)
   
